@@ -1,0 +1,46 @@
+[build-system]
+requires = ["flit_core <4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "slurmrun"
+version = "0.1.0"
+description = "Start interactive shells and jupyter instances on SLURM compute nodes."
+readme = "README.md"
+requires-python = ">= 3.6"
+license = {file = "LICENSE"}
+authors = [{name = "Marten Lienen", email = "marten.lienen@gmail.com"}]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python"
+]
+dependencies = [
+  "click",
+  "tomli",
+  "shellingham"
+]
+
+[project.scripts]
+slurmrun = "slurmrun.main:main"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.urls]
+homepage = "https://gitlab.lrz.de/martenlienen/slurmrun"
+
+[tool.flit.module]
+name = "slurmrun"
+
+[tool.flit.sdist]
+exclude = ["tests/"]
+
+[tool.black]
+line-length = 88
+target-version = ["py36"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
