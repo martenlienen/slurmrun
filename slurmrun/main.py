@@ -54,7 +54,7 @@ def shell(ctx, shell):
     srun.run_command([shell], config.slurm)
 
 
-def run_jupyter(subcommand, config):
+def run_jupyter(subcommand, config, timeout=None):
     run_dir = config_dir() / "run"
     run_dir.mkdir(parents=True, exist_ok=True)
     tmpdir = Path(tempfile.mkdtemp(dir=run_dir))
@@ -76,8 +76,10 @@ jupyter {subcommand} --no-browser --ip=${{hostnames[0]}}
     start = time.monotonic()
     while len(list(jp_rundir.glob("*server-*.json"))) == 0:
         time.sleep(0.2)
-        if time.monotonic() - start > 30.0:
-            click.secho("Waited for jupyter for 30 seconds. Aborting!", fg="red")
+        if timeout is not None and time.monotonic() - start > timeout:
+            click.secho(
+                f"Waited for jupyter for {timeout} seconds. Aborting!", fg="red"
+            )
             return
 
     for server_file in jp_rundir.glob("*server-*.json"):
@@ -104,14 +106,16 @@ Then access the following URL in your browser:
 
 
 @main.command()
-def lab():
+@click.option("--timeout", type=float, help="How long to wait for jupyter")
+def lab(timeout):
     """Run jupyter lab."""
     config = Config.from_user_settings()
-    run_jupyter("lab", config)
+    run_jupyter("lab", config, timeout)
 
 
 @main.command()
-def notebook():
+@click.option("--timeout", type=float, help="How long to wait for jupyter")
+def notebook(timeout):
     """Run jupyter notebook."""
     config = Config.from_user_settings()
-    run_jupyter("notebook", config)
+    run_jupyter("notebook", config, timeout)
