@@ -1,7 +1,9 @@
+import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict
 
+import click
 import tomli
 
 
@@ -19,6 +21,7 @@ class Config:
         if path.is_file():
             config = tomli.loads(path.read_text())
         else:
+            click.secho(f"No configuration file at {path}", fg="red", file=sys.stderr)
             config = {}
 
         return cls(slurm=config.get("slurm", {}))
