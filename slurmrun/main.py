@@ -55,15 +55,14 @@ def shell(ctx, shell):
 
 
 def run_jupyter(subcommand, config, timeout=None):
+    # Place the script in a subdirectory of $HOME, because that is on a shared network
+    # drive, so that the script will also be available on the compute node.
     run_dir = config_dir() / "run"
     run_dir.mkdir(parents=True, exist_ok=True)
     tmpdir = Path(tempfile.mkdtemp(dir=run_dir))
-    jp_rundir = tmpdir / "jupyter"
-    jp_rundir.mkdir()
 
     script = f"""#!/bin/bash
 hostnames=($(hostname --all-fqdns))
-export JUPYTER_RUNTIME_DIR={jp_rundir}
 jupyter {subcommand} --no-browser --ip=${{hostnames[0]}}
 """
 
@@ -72,37 +71,6 @@ jupyter {subcommand} --no-browser --ip=${{hostnames[0]}}
     script_path.chmod(0o755)
 
     srun.run_command([str(script_path)], config.slurm)
-
-    start = time.monotonic()
-    while len(list(jp_rundir.glob("*server-*.json"))) == 0:
-        time.sleep(0.2)
-        if timeout is not None and time.monotonic() - start > timeout:
-            click.secho(
-                f"Waited for jupyter for {timeout} seconds. Aborting!", fg="red"
-            )
-            return
-
-    for server_file in jp_rundir.glob("*server-*.json"):
-        server_cfg = json.loads(server_file.read_text())
-
-        url, port, token = server_cfg["url"], server_cfg["port"], server_cfg["token"]
-        url_components = urlparse(url)
-        host = url_components.hostname
-        scheme = url_components.scheme
-        if subcommand == "lab":
-            path = "lab"
-        else:
-            path = ""
-        msg = f"""
-Now open an SSH tunnel to this node:
-
-    ssh -L {port}:{host}:{port} fs
-
-Then access the following URL in your browser:
-
-    {scheme}://localhost:{port}/{path}?token={token}
-"""
-        click.secho(msg, fg="yellow", file=sys.stderr)
 
 
 @main.command()

@@ -16,7 +16,7 @@ pipx install git+https://github.com/martenlienen/slurmrun.git
 ## Usage
 
 `slurmrun` has multiple subcommands to run different things. In the end, they all defer to
-`srun`, though the jupyter commands do some post-processing to help you connect to the
+`srun`, though the jupyter commands do some pre-processing to help you connect to the
 server.
 
 ```sh
@@ -41,21 +41,21 @@ qos = "interactive"
 
 With `lab` and `notebook` you start a jupyter
 [lab](https://jupyterlab.readthedocs.io/en/stable/) or [notebook](https://jupyter.org/)
-instance respectively. After starting the server, `slurmrun` will show a command to set up
-an SSH tunnel to the SLURM node and print a URL for you to navigate to in your local
-browser, for example
+instance respectively. After starting the server, `slurmrun` will defer to the remote
+jupyter instance, which will print a URL for you to open in your browser, such as
 
 ```sh
 $ slurmrun lab
 # ...
-Now open an SSH tunnel to this node:
-
-    ssh -L 8888:gpu07.kdd.in.tum.de:8888 fs
-
-Then access the following URL in your browser:
-
-    http://localhost:8888/lab?token=599fef63cd7b7834771f945410e332a1d96caa0dae010a5e
+    To access the server, open this file in a browser:
+        file:///nfs/homedirs/lienen/.config/slurmrun/run/tmpxong3w1o/jupyter/jpserver-3645900-open.html
+    Or copy and paste one of these URLs:
+# ==>   http://gpu20.daml.in.tum.de:8888/lab?token=93c6cffc2c555117614d2e6f37f1e96d249a968e6565155a
+     or http://127.0.0.1:8888/lab?token=93c6cffc2c555117614d2e6f37f1e96d249a968e6565155a
 ```
+
+The line marked with `==>` is the one you have to access because it contains the external
+hostname of the compute node that you can access within the VPN.
 
 ### Shell and Other Commands
 
