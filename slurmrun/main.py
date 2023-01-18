@@ -63,7 +63,12 @@ def run_jupyter(subcommand, config, timeout=None):
 
     script = f"""#!/bin/bash
 hostnames=($(hostname --all-fqdns))
-jupyter {subcommand} --no-browser --ip=${{hostnames[0]}}
+
+# Resolve DNS name to IP to work around a misconfigured HSTS
+# directive on tum.de
+ip=$(getent hosts ${{hostnames[0]}} | awk '{{ print $1 }}')
+
+jupyter {subcommand} --no-browser --ip=${{ip}}
 """
 
     script_path = tmpdir / "jupyter.sh"
