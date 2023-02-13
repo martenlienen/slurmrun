@@ -11,8 +11,8 @@ def to_cmd_args(options: Dict[str, str]) -> List[str]:
 def run_command(command: List[str], options: Dict[str, str]):
     pid = os.fork()
     if pid == 0:
-        # Replace the parent process with the command, so that the command stays attached
-        # to the shell, and return in the child
+        # Replace the parent process with the command, so that the command stays
+        # attached to the shell, and return in the child
         return
 
     args = ["srun", "--pty"] + to_cmd_args(options) + command
