@@ -4,8 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "slurmrun"
-version = "0.2.1"
-description = "Start interactive shells and jupyter instances on SLURM compute nodes."
+dynamic = ["version", "description"]
 readme = "README.md"
 requires-python = ">= 3.6"
 license = {file = "LICENSE"}
